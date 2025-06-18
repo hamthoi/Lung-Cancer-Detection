@@ -43,7 +43,7 @@ class FlowerClient(NumPyClient):
 def client_fn(context: Context):
     # Load model and data
     net = Net()
-    data_dir = "../lung-cancer/Data"  # Relative path from the app folder
+    data_dir = "../Data"  # Relative path from the app folder
     trainloader, valloader, _ = load_data(data_dir)
     local_epochs = context.run_config["local-epochs"]
 

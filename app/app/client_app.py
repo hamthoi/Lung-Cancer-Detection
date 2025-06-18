@@ -10,12 +10,14 @@ from app.task import Net, get_weights, load_data, set_weights, test, train
 # Define Flower Client and client_fn
 class FlowerClient(NumPyClient):
     def __init__(self, net, trainloader, valloader, local_epochs):
-        self.net = net
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        if torch.cuda.device_count() > 1:
+            print(f"Using {torch.cuda.device_count()} GPUs!")
+            net = torch.nn.DataParallel(net)
+        self.net = net.to(self.device)
         self.trainloader = trainloader
         self.valloader = valloader
         self.local_epochs = local_epochs
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.net.to(self.device)
 
     def fit(self, parameters, config):
         set_weights(self.net, parameters)
@@ -40,7 +42,7 @@ class FlowerClient(NumPyClient):
 def client_fn(context: Context):
     # Load model and data
     net = Net()
-    data_dir = "dorsar/lung-cancer"  # Update this path as needed
+    data_dir = "../lung-cancer/Data"  # Relative path from the app folder
     trainloader, valloader, _ = load_data(data_dir)
     local_epochs = context.run_config["local-epochs"]
 

@@ -1,7 +1,7 @@
 """app: A Flower / PyTorch app."""
 
 from collections import OrderedDict
-import os
+from pathlib import Path
 
 import torch
 import torch.nn as nn
@@ -43,13 +43,15 @@ def load_data(data_dir: str):
             Normalize((0.5,), (0.5,)),         # Single channel mean/std
         ]
     )
-    train_dir = os.path.join(data_dir, "train")
-    valid_dir = os.path.join(data_dir, "valid")
-    test_dir = os.path.join(data_dir, "test")
+    # Use pathlib for robust path handling
+    data_path = Path(data_dir)
+    train_dir = data_path / "train"
+    valid_dir = data_path / "valid"
+    test_dir = data_path / "test"
 
-    trainset = ImageFolder(train_dir, transform=pytorch_transforms)
-    validset = ImageFolder(valid_dir, transform=pytorch_transforms)
-    testset = ImageFolder(test_dir, transform=pytorch_transforms)
+    trainset = ImageFolder(str(train_dir), transform=pytorch_transforms)
+    validset = ImageFolder(str(valid_dir), transform=pytorch_transforms)
+    testset = ImageFolder(str(test_dir), transform=pytorch_transforms)
 
     trainloader = DataLoader(trainset, batch_size=32, shuffle=True)
     validloader = DataLoader(validset, batch_size=32)

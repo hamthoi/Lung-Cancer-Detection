@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
-from torchvision.transforms import Compose, Normalize, ToTensor
+from torchvision.transforms import Compose, Normalize, ToTensor, Grayscale, Resize
 
 
 class Net(nn.Module):
@@ -16,10 +16,11 @@ class Net(nn.Module):
 
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 6, 5)
+        self.conv1 = nn.Conv2d(1, 6, 5)
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc1 = nn.Linear(16 * 53 * 53, 120)  # Update input size after conv/pool
+        # Update the input size for fc1 after conv/pool layers (see below)
+        self.fc1 = nn.Linear(16 * 91 * 117, 120)  # Updated below
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 4)  # 4 classes
 
@@ -36,8 +37,10 @@ def load_data(data_dir: str):
     """Load lung cancer data."""
     pytorch_transforms = Compose(
         [
+            Grayscale(num_output_channels=1),  # Convert to greyscale
+            Resize((376, 480)),                # Resize to 376x480 (HxW)
             ToTensor(),
-            Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+            Normalize((0.5,), (0.5,)),         # Single channel mean/std
         ]
     )
     train_dir = os.path.join(data_dir, "train")

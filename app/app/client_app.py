@@ -3,7 +3,7 @@
 import torch
 
 from flwr.client import ClientApp, NumPyClient
-from flwr.common import Context
+from flwr.common import Context, ConfigRecord
 from app.task import Net, get_weights, load_data, set_weights, test, train
 
 
@@ -25,6 +25,7 @@ class FlowerClient(NumPyClient):
             self.net,
             self.trainloader,
             self.local_epochs,
+            config["lr"],
             self.device,
         )
         return (

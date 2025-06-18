@@ -11,7 +11,7 @@ from torchvision.datasets import ImageFolder
 from torchvision.transforms import Compose, Normalize, ToTensor, Grayscale, Resize
 
 # Load global test set from local files
-data_dir = Path("../lung-cancer/Data")  # Adjust if needed
+data_dir = Path("../Data")  # Adjust if needed
 test_dir = data_dir / "test"
 test_transforms = Compose(
     [

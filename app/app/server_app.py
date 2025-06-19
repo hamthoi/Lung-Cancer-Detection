@@ -56,7 +56,7 @@ def on_fit_config(server_round: int) -> Metrics:
     """Adjusts learning rate based on current round."""
     lr = 0.001
     # Appply a simple learning rate decay
-    if server_round > 2:
+    if server_round > 5:
         lr = 0.0005
     return {"lr": lr}
 

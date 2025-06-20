@@ -3,7 +3,7 @@
 import torch
 
 from flwr.client import ClientApp, NumPyClient
-from flwr.common import Context, ConfigRecord
+from flwr.common import Context
 from app.task import Net, get_weights, load_data, set_weights, test, train
 
 

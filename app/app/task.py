@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
-from torchvision.transforms import Compose, Normalize, ToTensor, Grayscale, Resize
+from torchvision.transforms import Compose, Grayscale, ToTensor, Normalize, Resize
 
 
 class Net(nn.Module):
@@ -16,21 +16,25 @@ class Net(nn.Module):
 
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 6, 5)
+        self.conv1 = nn.Conv2d(1, 16, 3, padding=1)
+        self.bn1 = nn.BatchNorm2d(16)
+        self.conv2 = nn.Conv2d(16, 32, 3, padding=1)
+        self.bn2 = nn.BatchNorm2d(32)
         self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        # Update the input size for fc1 after conv/pool layers (see below)
-        self.fc1 = nn.Linear(16 * 91 * 117, 120)  # Updated below
-        self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 4)  # 4 classes
+        self.conv3 = nn.Conv2d(32, 64, 3, padding=1)
+        self.bn3 = nn.BatchNorm2d(64)
+        self.fc1 = nn.Linear(64 * 47 * 60, 128)  # Adjust based on output size after pooling
+        self.dropout = nn.Dropout(0.5)
+        self.fc2 = nn.Linear(128, 4)
 
     def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
+        x = self.pool(F.relu(self.bn1(self.conv1(x))))
+        x = self.pool(F.relu(self.bn2(self.conv2(x))))
+        x = self.pool(F.relu(self.bn3(self.conv3(x))))
         x = x.view(x.size(0), -1)
         x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        return self.fc3(x)
+        x = self.dropout(x)
+        return self.fc2(x)
 
 
 def load_data(data_dir: str):
